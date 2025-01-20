@@ -38,23 +38,23 @@
     <td>Tuesday</td>
     <td>-</td>
     <td>-</td>
-    <td></td>
+    <td>Prepare the workshop</td>
   </tr>
   <tr>
     <td>Wednesday</td>
-    <td></td>
-    <td></td>
-    <td></td>
+    <td>Workshops</td>
+    <td>Workshops</td>
+    <td>Branch(technical,fonctional)</td>
   </tr>
   <tr>
     <td>Thursday</td>
-    <td>project fil rouge</td>
-    <td></td>
-    <td></td>
+    <td>Project fil rouge</td>
+    <td>Prototype</td>
+    <td>Prototype</td>
   </tr>
   <tr>
     <td>Friday</td>
-    <td></td>
+    <td>Database</td>
     <td></td>
     <td>-</td>
   </tr>
