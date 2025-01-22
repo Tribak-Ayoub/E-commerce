@@ -48,8 +48,8 @@
   </tr>
   <tr>
     <td>Thursday</td>
-    <td>Branch(technical,fonctional)</td>
     <td>Project fil rouge</td>
+    <td>Branch(technical,fonctional)</td>
     <td>Prototype</td>
   </tr>
   <tr>
