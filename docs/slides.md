@@ -116,7 +116,8 @@
 
 ### **7. Prototype:**
 
-- blog (Previous prototype)
+- add product
+- show product
 - ajax (one-page)
 - repository
 
