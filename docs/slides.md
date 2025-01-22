@@ -44,48 +44,48 @@
     <td>Wednesday</td>
     <td>Workshops</td>
     <td>Workshops</td>
-    <td>Branch(technical,fonctional)</td>
+    <td>Workshops</td>
   </tr>
   <tr>
     <td>Thursday</td>
+    <td>Branch(technical,fonctional)</td>
     <td>Project fil rouge</td>
-    <td>Prototype</td>
     <td>Prototype</td>
   </tr>
   <tr>
     <td>Friday</td>
-    <td>Database</td>
-    <td></td>
+    <td>Prototype</td>
+    <td>Prototype</td>
     <td>-</td>
   </tr>
   <tr>
     <td>Monday</td>
-    <td></td>
-    <td></td>
-    <td></td>
+    <td>Database</td>
+    <td>Realization</td>
+    <td>Realization</td>
   </tr>
   <tr>
     <td>Tuesday</td>
     <td>-</td>
     <td>-</td>
-    <td></td>
+    <td>Realization</td>
   </tr>
   <tr>
     <td>Wednesday</td>
-    <td></td>
-    <td></td>
-    <td></td>
+    <td>Realization</td>
+    <td>Realization</td>
+    <td>Realization</td>
   </tr>
   <tr>
     <td>Thursday</td>
-    <td></td>
-    <td></td>
-    <td></td>
+    <td>Realization</td>
+    <td>Realization</td>
+    <td>Realization</td>
   </tr>
   <tr>
     <td>Friday</td>
-    <td></td>
-    <td></td>
+    <td>Realization</td>
+    <td>Realization</td>
     <td>-</td>
   </tr>
 </table>
