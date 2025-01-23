@@ -1,12 +1,22 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav x-data="{ open: false, sidebarOpen: false }" class="bg-white border-b border-gray-100">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
+            <!-- Logo and Nav Links -->
             <div class="flex">
+                <!-- Sidebar Toggle Button (Mobile) -->
+                <div class="flex items-center sm:hidden">
+                    <button @click="sidebarOpen = !sidebarOpen" class="p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                        <!-- <x-application-logo class="block h-9 w-auto fill-current text-gray-800" /> -->
                     </a>
                 </div>
 
@@ -52,7 +62,7 @@
                 </x-dropdown>
             </div>
 
-            <!-- Hamburger -->
+            <!-- Hamburger (Mobile Nav Toggle) -->
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
@@ -64,7 +74,7 @@
         </div>
     </div>
 
-    <!-- Responsive Navigation Menu -->
+    <!-- Responsive Navigation Menu (Mobile) -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
@@ -98,3 +108,37 @@
         </div>
     </div>
 </nav>
+
+<!-- Sidebar -->
+<aside x-data="{ sidebarOpen: false }" class="w-64 bg-gray-800 text-white min-h-screen transform transition-transform duration-200 ease-in-out fixed" :class="{ '-translate-x-full': !sidebarOpen, 'translate-x-0': sidebarOpen }">
+    <div class="p-4">
+        <!-- Sidebar Header -->
+        <div class="text-lg font-semibold">Menu</div>
+
+        <!-- Sidebar Links -->
+        <nav class="mt-4">
+            <ul class="space-y-2">
+                <li>
+                    <a href="{{ route('dashboard') }}" class="block px-4 py-2 hover:bg-gray-700 rounded">
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="block px-4 py-2 hover:bg-gray-700 rounded">
+                        Products
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="block px-4 py-2 hover:bg-gray-700 rounded">
+                        Orders
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="block px-4 py-2 hover:bg-gray-700 rounded">
+                        Settings
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</aside>
