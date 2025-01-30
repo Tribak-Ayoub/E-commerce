@@ -11,7 +11,8 @@ class ProductRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
+        // return auth()->user() && auth()->user()->hasRole('admin'); // Allow only admins
     }
 
     /**
@@ -22,7 +23,9 @@ class ProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|max:255',
+            'price' => 'required|numeric',
+            'description' => 'required',
         ];
     }
 }

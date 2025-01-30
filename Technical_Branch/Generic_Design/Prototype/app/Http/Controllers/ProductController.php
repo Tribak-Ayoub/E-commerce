@@ -2,18 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProductRequest;
 use App\Models\Product;
+use App\Repositories\ProductRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
+    protected $productRepository;
+
+    public function __construct(ProductRepositoryInterface $productRepository)
+    {
+        $this->productRepository = $productRepository;
+    }
+    
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $products = Product::paginate(10); 
+        $products = $this->productRepository->all();
         return view('admin.products.index', compact('products'));
     }
 
@@ -22,45 +31,40 @@ class ProductController extends Controller
      */
     public function create()
     {
+        if (request()->ajax()) {
+            return response()->json([
+                'view' => view('admin.products.create')->render()
+            ]);
+        }
         return view('admin.products.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ProductRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|max:255',
-            'price' => 'required|numeric',
-            'description' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 400,
-                'errors' => $validator->messages(),
-            ]);
-        } else {
-            $product = Product::create([
-                'name' => $request->name,
-                'price' => $request->price,
-                'description' => $request->description,
-            ]);
-
+        try {
+            $product = $this->productRepository->create($request->validated());
             return response()->json([
                 'status' => 200,
-                'success' => true, // Added this for success
-                'product' => $product, // Return the newly created product
+                'success' => true,
+                'product' => $product,
             ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Server Error: ' . $e->getMessage(),
+            ], 500);
         }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Product $product)
+    public function show($id)
     {
+        $product = $this->productRepository->find($id);
         return view('admin.products.show', compact('product'));
     }
 
@@ -83,11 +87,15 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Product $product)
+    public function destroy($id)
     {
-        $product->delete();
+        $this->productRepository->delete($id);
 
         return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
+        // return response()->json([
+        //     'status' => 200,
+        //     'message' => 'Product deleted successfully.'
+        // ]);
     
     }
 }

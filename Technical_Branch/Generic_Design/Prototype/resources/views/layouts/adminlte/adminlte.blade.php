@@ -6,6 +6,7 @@
     <title>@yield('title', 'Admin Dashboard')</title>
     
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {{-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script> --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
