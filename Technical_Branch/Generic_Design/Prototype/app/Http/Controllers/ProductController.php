@@ -32,6 +32,8 @@ class ProductController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
+            'price' => 'required|numeric',
+            'description' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -40,9 +42,11 @@ class ProductController extends Controller
                 'errors' => $validator->messages(),
             ]);
         } else {
-            $product = new Product();
-            $product->name = $request->name;
-            $product->save();
+            $product = Product::create([
+                'name' => $request->name,
+                'price' => $request->price,
+                'description' => $request->description,
+            ]);
 
             return response()->json([
                 'status' => 200,
@@ -57,7 +61,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        //
+        return view('admin.products.show', compact('product'));
     }
 
     /**
@@ -81,6 +85,9 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        $product->delete();
+
+        return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
+    
     }
 }

@@ -8,7 +8,7 @@
 
   <!-- Right navbar links -->
   <ul class="navbar-nav ml-auto">
-    <li class="nav-item dropdown">
+    {{-- <li class="nav-item dropdown">
       <a class="nav-link" data-toggle="dropdown" href="#">
         <span class="">Ayoub  <i class="right fas fa-angle-down"></i> </span>
       </a>
@@ -22,28 +22,36 @@
         se déconnecter
         </a>
       </div>
-    </li>
-    <!-- Notifications Dropdown Menu -->
-    <li class="nav-item dropdown">
-      <a class="nav-link" data-toggle="dropdown" href="#">
-        <i class="far fa-bell"></i>
-        <span class="badge badge-warning navbar-badge">15</span>
-      </a>
-      <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-        <span class="dropdown-item dropdown-header">15 Notifications</span>
-        <div class="dropdown-divider"></div>
-        <a href="#" class="dropdown-item">
-          <i class="fas fa-envelope mr-2"></i> 4 nouveaux messages
-          <span class="float-right text-muted text-sm">3 mins</span>
-        </a>
-        <div class="dropdown-divider"></div>
-        <a href="#" class="dropdown-item">
-          <i class="fas fa-file mr-2"></i> 3 nouveaux rapports
-          <span class="float-right text-muted text-sm">2 days</span>
-        </a>
-        <div class="dropdown-divider"></div>
-        <a href="#" class="dropdown-item dropdown-footer">Voir toutes les notifications</a>
-      </div>
-    </li>
+    </li> --}}
+
+    <!-- Settings Dropdown -->
+    @if(Auth::check())
+<div class="d-none d-sm-flex align-items-center ms-3">
+  <div class="dropdown">
+      <button class="btn btn-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          {{ Auth::user()->name }}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+          <li>
+              <a class="dropdown-item" href="{{ route('profile.edit') }}">{{ __('Profile') }}</a>
+          </li>
+          <li>
+              <form method="POST" action="{{ route('logout') }}">
+                  @csrf
+                  <button class="dropdown-item" type="submit">{{ __('Log Out') }}</button>
+              </form>
+          </li>
+      </ul>
+  </div>
+</div>
+
+<!-- Hamburger (Mobile Nav Toggle) -->
+<div class="d-sm-none">
+  <button class="btn btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu" aria-expanded="false" aria-controls="mobileMenu">
+      <span class="navbar-toggler-icon"></span>
+  </button>
+</div>
+@endif
+
   </ul>
 </nav>

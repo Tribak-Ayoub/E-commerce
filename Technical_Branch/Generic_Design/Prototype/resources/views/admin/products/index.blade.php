@@ -1,4 +1,4 @@
-@extends('layouts.adminlte.adminlte')  <!-- Assuming you have a layout for AdminLTE -->
+@extends('layouts.adminlte.adminlte')  
 
 @section('content')
     <div class="card card-info">
@@ -9,12 +9,10 @@
         <div class="card-body">
             <div class="row mb-3">
                 <div class="col-6">
-                    <a href="{{ route('products.create') }}" id="showCreateForm">
-                        <button  class="btn btn-primary" >
-                            Add Product
-                        </button>
-                    </a>
-
+                    <!-- Use a button instead of an anchor tag -->
+                    <button id="showCreateForm" class="btn btn-primary">
+                        Add Product
+                    </button>
                 </div>
                 <div class="row col-6 justify-content-end">
                     <!-- Filter Column -->
@@ -61,9 +59,8 @@
                     <tr>
                         <th style="width: 10px">#</th>
                         <th>Product Name</th>
-                        <th>Category</th>
+                        <th>Description</th>
                         <th>Price</th>
-                        <th>Stock Quantity</th>
                         <th style="width: 40px">Action</th>
                     </tr>
                 </thead>
@@ -72,11 +69,15 @@
                         <tr>
                             <td>{{ $product->id }}</td>
                             <td>{{ $product->name }}</td>
-                            <td><span class="badge badge-info p-2">{{ $product->category }}</span></td>
+                            <td class="w-50">{{ $product->description}}</td>
                             <td>{{ $product->price }}€</td>
-                            <td>{{ $product->stock_quantity }}</td>
-                            <td class="text-center">
+                            <td class="d-flex justify-content-around align-items-center">
                                 <a href="{{ route('products.show', $product->id) }}"><i class="far fa-eye"></i></a>
+                                <form action="{{ route('products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                                </form>
                             </td>
                         </tr>
                     @endforeach
@@ -88,82 +89,91 @@
             {{ $products->links() }}
         </div>
     </div>
-@endsection
 
-@push('scripts')
-    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script> --}}
+
     <script>
         $(document).ready(function () {
-        $(document).on('click', '#showCreateForm', function (e) {
-            e.preventDefault();
-            const url = $(this).attr('href');
-    
-            // Show a loading indicator in the dialog
-            bootbox.dialog({
-                title: "Create Product",
-                message: `<div class="loading">Loading...</div>`,
-                size: 'large',
-            });
-    
-            $.ajax({
-                type: 'GET',
-                url: url,
-                success: function (response) {
-                    // Replace loading indicator with the form
-                    // $(".loading").replaceWith(`<div class='form-container'>${response}</div>`);
-                    bootbox.dialog({
-                        title: "Create Product",
-                        message: "<div class='form-container'></div>",
+            // Show the create form in a modal
+            $(document).on('click', '#showCreateForm', function (e) {
+                e.preventDefault(); // Prevent default button behavior
 
-                    });
-                    $('.createForm').html(response);
-                },
-                error: function (xhr, status, error) {
-                    $(".loading").replaceWith(`<div class="error">Failed to load the form. Please try again.</div>`);
-                }
-            });
-        });
-    
-        $(document).on('submit', '#product-form', function (e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-    
-            // Show loading indicator during submission
-            $("button[type='submit']").prop("disabled", true).text('Submitting...');
-            
-            $.ajax({
-                type: 'POST',
-                url: "{{ route('products.store') }}",
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function (res) {
-                    $("button[type='submit']").prop("disabled", false).text('Submit');
-                    if (res.success) {
-                        // Dynamically append the new product
-                        $('table tbody').append(`
-                            <tr>
-                                <td>${res.product.id}</td>
-                                <td>${res.product.name}</td>
-                                <td><span class="badge badge-info p-2">${res.product.category}</span></td>
-                                <td>${res.product.price}€</td>
-                                <td>${res.product.stock_quantity}</td>
-                                <td class="text-center">
-                                    <a href="/products/${res.product.id}"><i class="far fa-eye"></i></a>
-                                </td>
-                            </tr>
-                        `);
-                        bootbox.hideAll();
-                    } else {
-                        alert('Error: ' + res.message);
+                const url = "{{ route('products.create') }}"; // URL to fetch the form
+
+                // Show a loading indicator in the dialog
+                bootbox.dialog({
+                    title: "Create Product",
+                    message: `<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</div>`,
+                    size: 'large',
+                    onEscape: true,
+                    backdrop: true,
+                });
+
+                // Fetch the form via AJAX
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    success: function (response) {
+                        // Replace loading indicator with the form
+                        bootbox.dialog({
+                            title: "Create Product",
+                            message: response,
+                            size: 'large',
+                            onEscape: true,
+                            backdrop: true,
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        bootbox.alert("Failed to load the form. Please try again.");
                     }
-                },
-                error: function (xhr, status, error) {
-                    $("button[type='submit']").prop("disabled", false).text('Submit');
-                    alert('Request failed: ' + error);
-                }
+                });
+            });
+
+            // Handle form submission via AJAX
+            $(document).on('submit', '#product-form', function (e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                console.log("Submitting form data:", formData); // Debugging
+
+                // Show loading indicator during submission
+                $("button[type='submit']").prop("disabled", true).text('Submitting...');
+
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ route('products.store') }}",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (res) {
+                        $("button[type='submit']").prop("disabled", false).text('Submit');
+                        if (res.success) {
+                            // Dynamically append the new product
+                            $('table tbody').append(`
+                                <tr>
+                                    <td>${res.product.id}</td>
+                                    <td>${res.product.name}</td>
+                                    <td>${res.product.description}</td>
+                                    <td>${res.product.price}€</td>
+                                    <td class="d-flex justify-content-around align-items-center">
+                                        <a href="/products/${res.product.id}"><i class="far fa-eye"></i></a>
+                                        <form action="/products/${res.product.id}" method="POST" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            `);
+                            bootbox.hideAll(); // Close the modal
+                        } else {
+                            bootbox.alert('Error: ' + res.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        $("button[type='submit']").prop("disabled", false).text('Submit');
+                        bootbox.alert('Request failed: ' + error);
+                    }
+                });
             });
         });
-    });
     </script>
-@endpush
+@endsection
