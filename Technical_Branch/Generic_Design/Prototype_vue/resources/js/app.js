@@ -12,8 +12,8 @@ createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) =>
         resolvePageComponent(
-            `./Pages/${name}.vue`,
-            import.meta.glob('./Pages/**/*.vue'),
+            `./Pages/Products/${name}.vue`,
+            import.meta.glob('./Pages/Products/**/*.vue'),
         ),
     setup({ el, App, props, plugin }) {
         return createApp({ render: () => h(App, props) })

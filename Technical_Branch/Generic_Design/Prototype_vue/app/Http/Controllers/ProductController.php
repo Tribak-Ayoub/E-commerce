@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Repositories\ProductRepositoryInterface;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ProductController extends Controller
 {
@@ -20,7 +21,13 @@ class ProductController extends Controller
     public function index()
     {
         $products = $this->productRepository->all();
-        return response()->json($products);
+        // dd($products);
+        // return Inertia::render('Products/Index', [
+        //     'products' => $products->toArray(),
+        // ]);
+        return Inertia::render('Index', [
+            'products' => $products->items(),  // Pass the items (products) only
+        ]);    
     }
 
     /**
@@ -37,7 +44,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $product = $this->productRepository->create($request->validated());
-        return response()->json($product);
+        return redirect()->route('products.index')->with('success', 'Product created successfully');
     }
 
     /**
@@ -62,7 +69,7 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $product = $this->productRepository->update($product, $request->validated());
-        return response()->json($product);
+        return redirect()->route('products.index')->with('success', 'Product updated successfully');
     }
 
     /**
@@ -71,13 +78,13 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $this->productRepository->delete($product);
-        return response()->json(['message' => 'Product deleted successfully']);
+        return redirect()->route('products.index')->with('success', 'Product deleted successfully');
 
     }
 
     public function restore($product)
     {
         $this->productRepository->restore($product);
-        return response()->json(['message' => 'Product restored successfully']);
+        return redirect()->route('products.index')->with('success', 'Product restored successfully');
     }
 }

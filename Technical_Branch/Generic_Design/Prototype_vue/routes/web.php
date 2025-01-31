@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Models\Product;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::resource('products', ProductController::class);
+Route::post('products/{product}/restore', [ProductController::class, 'restore'])->name('products.restore');
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
