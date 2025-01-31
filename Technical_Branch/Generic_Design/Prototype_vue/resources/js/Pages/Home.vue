@@ -1,4 +1,5 @@
 <template>
+  <AuthenticatedLayout>
     <h1>Product List</h1>
     <button @click="showModal" class="btn show-modal-btn">Add Product</button>
     <div>
@@ -30,12 +31,14 @@
         </tbody>
       </table>
     </div>
+  </AuthenticatedLayout>
   </template>
   
   <script setup>
   import axios from 'axios';
   import { ref, onMounted } from 'vue';
-  import CreateProduct from '../components/CreateProduct.vue';
+  import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+  import CreateProduct from '@/components/CreateProduct.vue';
   
   const show = ref(false); // Reactive show state
   
