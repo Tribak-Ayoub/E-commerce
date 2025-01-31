@@ -52,7 +52,6 @@
   const fetchProducts = async () => {
     try {
       const response = await axios.get('/api/products');
-      console.log('API Response:', response.data);
       products.value = response.data.data; // Use response.data.data for paginated data
     } catch (error) {
       console.error('Error fetching products:', error);
