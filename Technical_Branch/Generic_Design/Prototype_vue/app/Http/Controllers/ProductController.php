@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProductRequest;
 use App\Models\Product;
 use App\Repositories\ProductRepositoryInterface;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 class ProductController extends Controller
 {
@@ -20,14 +20,13 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = $this->productRepository->all();
-        // dd($products);
-        // return Inertia::render('Products/Index', [
-        //     'products' => $products->toArray(),
-        // ]);
-        return Inertia::render('Index', [
-            'products' => $products->items(),  // Pass the items (products) only
-        ]);    
+        try {
+            $products = $this->productRepository->all();
+            
+            return response()->json($products);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to fetch products: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -41,10 +40,16 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ProductRequest $request)
     {
-        $product = $this->productRepository->create($request->validated());
-        return redirect()->route('products.index')->with('success', 'Product created successfully');
+        try {
+            // Create the product using the repository
+            $product = $this->productRepository->create($request->validated());
+            return response()->json($product, 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to create product: ' . $e->getMessage()], 500);
+        }
+
     }
 
     /**
@@ -66,7 +71,7 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product)
+    public function update(ProductRequest $request, Product $product)
     {
         $product = $this->productRepository->update($product, $request->validated());
         return redirect()->route('products.index')->with('success', 'Product updated successfully');
@@ -75,10 +80,14 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Product $product)
+    public function destroy($id)
     {
-        $this->productRepository->delete($product);
-        return redirect()->route('products.index')->with('success', 'Product deleted successfully');
+        try {
+            $this->productRepository->delete($id);
+            return response()->json(['message' => 'Product deleted successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete product: ' . $e->getMessage()], 500);
+        }
 
     }
 
