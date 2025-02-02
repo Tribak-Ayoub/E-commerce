@@ -1,11 +1,13 @@
 <script setup>
+import { ref } from 'vue';
+import axios from 'axios';
 import Checkbox from '@/Components/Checkbox.vue';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { useRoute, useRouter } from 'vue-router';
 
 defineProps({
     canResetPassword: {
@@ -16,23 +18,41 @@ defineProps({
     },
 });
 
-const form = useForm({
-    email: '',
-    password: '',
-    remember: false,
-});
+const email = ref('');
+const password = ref('');
+const remember = ref(false);
+const errors = ref({});
+const processing = ref(false);
+const router = useRouter();
 
-const submit = () => {
-    form.post(route('login'), {
-        onFinish: () => form.reset('password'),
-    });
+const submit = async () => {
+    processing.value = true;
+    errors.value = {}; // Clear previous errors
+
+    try {
+        const response = await axios.post('/login', {
+            email: email.value,
+            password: password.value,
+            remember: remember.value,
+        });
+
+        // Redirect to dashboard or home page after login
+        router.push('/dashboard');
+    } catch (error) {
+        if (error.response && error.response.status === 422) {
+            errors.value = error.response.data.errors; // Store validation errors
+        } else {
+            console.error('Login failed:', error);
+        }
+    } finally {
+        processing.value = false;
+        password.value = ''; // Reset password field
+    }
 };
 </script>
 
 <template>
     <GuestLayout>
-        <Head title="Log in" />
-
         <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
             {{ status }}
         </div>
@@ -45,13 +65,13 @@ const submit = () => {
                     id="email"
                     type="email"
                     class="mt-1 block w-full"
-                    v-model="form.email"
+                    v-model="email"
                     required
                     autofocus
                     autocomplete="username"
                 />
 
-                <InputError class="mt-2" :message="form.errors.email" />
+                <InputError class="mt-2" :message="errors.email ? errors.email[0] : ''" />
             </div>
 
             <div class="mt-4">
@@ -61,36 +81,34 @@ const submit = () => {
                     id="password"
                     type="password"
                     class="mt-1 block w-full"
-                    v-model="form.password"
+                    v-model="password"
                     required
                     autocomplete="current-password"
                 />
 
-                <InputError class="mt-2" :message="form.errors.password" />
+                <InputError class="mt-2" :message="errors.password ? errors.password[0] : ''" />
             </div>
 
             <div class="mt-4 block">
                 <label class="flex items-center">
-                    <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ms-2 text-sm text-gray-600"
-                        >Remember me</span
-                    >
+                    <Checkbox name="remember" v-model:checked="remember" />
+                    <span class="ms-2 text-sm text-gray-600">Remember me</span>
                 </label>
             </div>
 
             <div class="mt-4 flex items-center justify-end">
-                <Link
+                <router-link
                     v-if="canResetPassword"
-                    :href="route('password.request')"
+                    to="/password/reset"
                     class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
                     Forgot your password?
-                </Link>
+                </router-link>
 
                 <PrimaryButton
                     class="ms-4"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
+                    :class="{ 'opacity-25': processing }"
+                    :disabled="processing"
                 >
                     Log in
                 </PrimaryButton>

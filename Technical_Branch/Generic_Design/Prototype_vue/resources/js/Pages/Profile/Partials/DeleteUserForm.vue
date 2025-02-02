@@ -1,19 +1,17 @@
 <script setup>
+import { ref, nextTick } from 'vue';
 import DangerButton from '@/Components/DangerButton.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import Modal from '@/Components/Modal.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { useForm } from '@inertiajs/vue3';
-import { nextTick, ref } from 'vue';
+import axios from 'axios';
 
 const confirmingUserDeletion = ref(false);
 const passwordInput = ref(null);
-
-const form = useForm({
-    password: '',
-});
+const password = ref('');
+const errors = ref({});
 
 const confirmUserDeletion = () => {
     confirmingUserDeletion.value = true;
@@ -21,20 +19,24 @@ const confirmUserDeletion = () => {
     nextTick(() => passwordInput.value.focus());
 };
 
-const deleteUser = () => {
-    form.delete(route('profile.destroy'), {
-        preserveScroll: true,
-        onSuccess: () => closeModal(),
-        onError: () => passwordInput.value.focus(),
-        onFinish: () => form.reset(),
-    });
+const deleteUser = async () => {
+    try {
+        await axios.delete('/profile/destroy', {
+            data: { password: password.value },
+        });
+        closeModal();
+    } catch (error) {
+        if (error.response && error.response.data.errors) {
+            errors.value = error.response.data.errors;
+        }
+        passwordInput.value.focus();
+    }
 };
 
 const closeModal = () => {
     confirmingUserDeletion.value = false;
-
-    form.clearErrors();
-    form.reset();
+    errors.value = {};
+    password.value = '';
 };
 </script>
 
@@ -56,9 +58,7 @@ const closeModal = () => {
 
         <Modal :show="confirmingUserDeletion" @close="closeModal">
             <div class="p-6">
-                <h2
-                    class="text-lg font-medium text-gray-900"
-                >
+                <h2 class="text-lg font-medium text-gray-900">
                     Are you sure you want to delete your account?
                 </h2>
 
@@ -69,23 +69,19 @@ const closeModal = () => {
                 </p>
 
                 <div class="mt-6">
-                    <InputLabel
-                        for="password"
-                        value="Password"
-                        class="sr-only"
-                    />
+                    <InputLabel for="password" value="Password" class="sr-only" />
 
                     <TextInput
                         id="password"
                         ref="passwordInput"
-                        v-model="form.password"
+                        v-model="password"
                         type="password"
                         class="mt-1 block w-3/4"
                         placeholder="Password"
                         @keyup.enter="deleteUser"
                     />
 
-                    <InputError :message="form.errors.password" class="mt-2" />
+                    <InputError :message="errors.password" class="mt-2" />
                 </div>
 
                 <div class="mt-6 flex justify-end">
@@ -95,8 +91,8 @@ const closeModal = () => {
 
                     <DangerButton
                         class="ms-3"
-                        :class="{ 'opacity-25': form.processing }"
-                        :disabled="form.processing"
+                        :class="{ 'opacity-25': !password || errors.value.password }"
+                        :disabled="!password || errors.value.password"
                         @click="deleteUser"
                     >
                         Delete Account

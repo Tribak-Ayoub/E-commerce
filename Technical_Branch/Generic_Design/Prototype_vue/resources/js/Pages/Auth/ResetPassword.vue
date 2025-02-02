@@ -1,10 +1,12 @@
 <script setup>
+import { ref } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { Head, useForm } from '@inertiajs/vue3';
 
 const props = defineProps({
     email: {
@@ -17,24 +19,42 @@ const props = defineProps({
     },
 });
 
-const form = useForm({
-    token: props.token,
-    email: props.email,
-    password: '',
-    password_confirmation: '',
-});
+const email = ref(props.email);
+const token = ref(props.token);
+const password = ref('');
+const password_confirmation = ref('');
+const errors = ref({});
+const processing = ref(false);
+const router = useRouter();
 
-const submit = () => {
-    form.post(route('password.store'), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
-    });
+const submit = async () => {
+    processing.value = true;
+    errors.value = {}; // Reset errors
+
+    try {
+        const response = await axios.post('/password/reset', {
+            email: email.value,
+            token: token.value,
+            password: password.value,
+            password_confirmation: password_confirmation.value,
+        });
+
+        // Redirect to login page after successful reset
+        router.push('/login');
+    } catch (error) {
+        if (error.response && error.response.status === 422) {
+            errors.value = error.response.data.errors; // Capture validation errors
+        } else {
+            console.error('Password reset failed:', error);
+        }
+    } finally {
+        processing.value = false;
+    }
 };
 </script>
 
 <template>
     <GuestLayout>
-        <Head title="Reset Password" />
-
         <form @submit.prevent="submit">
             <div>
                 <InputLabel for="email" value="Email" />
@@ -43,13 +63,13 @@ const submit = () => {
                     id="email"
                     type="email"
                     class="mt-1 block w-full"
-                    v-model="form.email"
+                    v-model="email"
                     required
                     autofocus
                     autocomplete="username"
                 />
 
-                <InputError class="mt-2" :message="form.errors.email" />
+                <InputError class="mt-2" :message="errors.email ? errors.email[0] : ''" />
             </div>
 
             <div class="mt-4">
@@ -59,39 +79,33 @@ const submit = () => {
                     id="password"
                     type="password"
                     class="mt-1 block w-full"
-                    v-model="form.password"
+                    v-model="password"
                     required
                     autocomplete="new-password"
                 />
 
-                <InputError class="mt-2" :message="form.errors.password" />
+                <InputError class="mt-2" :message="errors.password ? errors.password[0] : ''" />
             </div>
 
             <div class="mt-4">
-                <InputLabel
-                    for="password_confirmation"
-                    value="Confirm Password"
-                />
+                <InputLabel for="password_confirmation" value="Confirm Password" />
 
                 <TextInput
                     id="password_confirmation"
                     type="password"
                     class="mt-1 block w-full"
-                    v-model="form.password_confirmation"
+                    v-model="password_confirmation"
                     required
                     autocomplete="new-password"
                 />
 
-                <InputError
-                    class="mt-2"
-                    :message="form.errors.password_confirmation"
-                />
+                <InputError class="mt-2" :message="errors.password_confirmation ? errors.password_confirmation[0] : ''" />
             </div>
 
             <div class="mt-4 flex items-center justify-end">
                 <PrimaryButton
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
+                    :class="{ 'opacity-25': processing }"
+                    :disabled="processing"
                 >
                     Reset Password
                 </PrimaryButton>

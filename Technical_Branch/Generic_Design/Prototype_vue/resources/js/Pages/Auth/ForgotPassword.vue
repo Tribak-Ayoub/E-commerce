@@ -1,40 +1,40 @@
 <script setup>
+import { ref } from 'vue';
+import axios from 'axios';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { Head, useForm } from '@inertiajs/vue3';
 
-defineProps({
-    status: {
-        type: String,
-    },
-});
+const email = ref('');
+const status = ref('');
+const errors = ref({});
 
-const form = useForm({
-    email: '',
-});
+const submit = async () => {
+    try {
+        const response = await axios.post('/password/email', { email: email.value });
 
-const submit = () => {
-    form.post(route('password.email'));
+        status.value = response.data.message; // Success message
+        errors.value = {}; // Clear errors
+    } catch (error) {
+        if (error.response && error.response.status === 422) {
+            errors.value = error.response.data.errors; // Validation errors
+        } else {
+            console.error('Request failed:', error);
+        }
+    }
 };
 </script>
 
 <template>
     <GuestLayout>
-        <Head title="Forgot Password" />
-
         <div class="mb-4 text-sm text-gray-600">
-            Forgot your password? No problem. Just let us know your email
-            address and we will email you a password reset link that will allow
-            you to choose a new one.
+            Forgot your password? No problem. Just enter your email address,
+            and we'll send you a password reset link.
         </div>
 
-        <div
-            v-if="status"
-            class="mb-4 text-sm font-medium text-green-600"
-        >
+        <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
             {{ status }}
         </div>
 
@@ -46,22 +46,17 @@ const submit = () => {
                     id="email"
                     type="email"
                     class="mt-1 block w-full"
-                    v-model="form.email"
+                    v-model="email"
                     required
                     autofocus
                     autocomplete="username"
                 />
 
-                <InputError class="mt-2" :message="form.errors.email" />
+                <InputError class="mt-2" :message="errors.email ? errors.email[0] : ''" />
             </div>
 
             <div class="mt-4 flex items-center justify-end">
-                <PrimaryButton
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
-                >
-                    Email Password Reset Link
-                </PrimaryButton>
+                <PrimaryButton> Email Password Reset Link </PrimaryButton>
             </div>
         </form>
     </GuestLayout>

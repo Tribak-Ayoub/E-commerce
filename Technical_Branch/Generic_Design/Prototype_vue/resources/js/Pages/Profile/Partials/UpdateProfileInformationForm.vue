@@ -1,9 +1,10 @@
 <script setup>
+import { ref } from 'vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { Link, useForm, usePage } from '@inertiajs/vue3';
+import axios from 'axios';
 
 defineProps({
     mustVerifyEmail: {
@@ -14,12 +15,26 @@ defineProps({
     },
 });
 
-const user = usePage().props.auth.user;
+const user = JSON.parse(localStorage.getItem('auth_user')) || {}; // Or any other method to get user data
 
-const form = useForm({
+const form = ref({
     name: user.name,
     email: user.email,
 });
+
+const errors = ref({});
+
+const updateProfile = async () => {
+    try {
+        await axios.patch('/profile/update', form.value);
+        // Reset errors and update success status
+        errors.value = {};
+    } catch (error) {
+        if (error.response && error.response.data.errors) {
+            errors.value = error.response.data.errors;
+        }
+    }
+};
 </script>
 
 <template>
@@ -34,10 +49,7 @@ const form = useForm({
             </p>
         </header>
 
-        <form
-            @submit.prevent="form.patch(route('profile.update'))"
-            class="mt-6 space-y-6"
-        >
+        <form @submit.prevent="updateProfile" class="mt-6 space-y-6">
             <div>
                 <InputLabel for="name" value="Name" />
 
@@ -51,7 +63,7 @@ const form = useForm({
                     autocomplete="name"
                 />
 
-                <InputError class="mt-2" :message="form.errors.name" />
+                <InputError class="mt-2" :message="errors.value.name" />
             </div>
 
             <div>
@@ -66,32 +78,29 @@ const form = useForm({
                     autocomplete="username"
                 />
 
-                <InputError class="mt-2" :message="form.errors.email" />
+                <InputError class="mt-2" :message="errors.value.email" />
             </div>
 
-            <div v-if="mustVerifyEmail && user.email_verified_at === null">
+            <div v-if="mustVerifyEmail && !user.email_verified_at">
                 <p class="mt-2 text-sm text-gray-800">
                     Your email address is unverified.
-                    <Link
-                        :href="route('verification.send')"
-                        method="post"
-                        as="button"
+                    <button
+                        @click.prevent="resendVerificationEmail"
                         class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
                         Click here to re-send the verification email.
-                    </Link>
+                    </button>
                 </p>
 
-                <div
-                    v-show="status === 'verification-link-sent'"
-                    class="mt-2 text-sm font-medium text-green-600"
-                >
+                <div v-show="status === 'verification-link-sent'" class="mt-2 text-sm font-medium text-green-600">
                     A new verification link has been sent to your email address.
                 </div>
             </div>
 
             <div class="flex items-center gap-4">
-                <PrimaryButton :disabled="form.processing">Save</PrimaryButton>
+                <PrimaryButton :disabled="!form.name || !form.email">
+                    Save
+                </PrimaryButton>
 
                 <Transition
                     enter-active-class="transition ease-in-out"
@@ -100,7 +109,7 @@ const form = useForm({
                     leave-to-class="opacity-0"
                 >
                     <p
-                        v-if="form.recentlySuccessful"
+                        v-if="!Object.keys(errors.value).length"
                         class="text-sm text-gray-600"
                     >
                         Saved.

@@ -45,6 +45,9 @@ const logout = () => {
                 <NavLink :to="{ name: 'dashboard' }" :active="route.name === 'dashboard'">
                   Dashboard
                 </NavLink>
+                <NavLink :to="{ name: 'home' }" :active="route.name === 'home'">
+                  Products
+                </NavLink>
               </div>
             </div>
 
