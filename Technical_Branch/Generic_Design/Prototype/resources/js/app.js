@@ -1,9 +1,8 @@
-import $ from 'jquery'; // Import jQuery and assign it to `$`
-window.$ = window.jQuery = $; // Make jQuery available globally
-
-import 'bootstrap'; // Import Bootstrap (required for AdminLTE)
+import $ from 'jquery';
+import bootbox from 'bootbox';
+import 'bootstrap';
 import 'admin-lte'; // Import AdminLTE (depends on jQuery and Bootstrap)
-import bootbox from 'bootbox'; // Import Bootbox (depends on jQuery)
+import './products';
 
 // Import AlpineJS (if used in your project)
 // import './bootstrap';
@@ -11,3 +10,4 @@ import bootbox from 'bootbox'; // Import Bootbox (depends on jQuery)
 
 // window.Alpine = Alpine;
 // Alpine.start();
+

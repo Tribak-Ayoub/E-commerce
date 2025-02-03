@@ -11,6 +11,16 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// // Public Routes (No Authentication)
+// Route::get('/products', [ProductController::class, 'publicIndex'])->name('products.index'); 
+// Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
+
+// // Admin Routes (Require Authentication)
+// Route::middleware(['auth'])->prefix('admin')->group(function () {
+//     Route::get('/products', [ProductController::class, 'adminIndex'])->name('admin.products.index'); 
+//     Route::resource('products', ProductController::class)->except(['index', 'show']);
+// });
+
 Route::resource('products', ProductController::class)->middleware('auth');
 
 Route::get('/dashboard', function () {

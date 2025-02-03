@@ -89,13 +89,27 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        $this->productRepository->delete($id);
-
-        return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
-        // return response()->json([
-        //     'status' => 200,
-        //     'message' => 'Product deleted successfully.'
-        // ]);
+        try {
+            $deleted = $this->productRepository->delete($id);
     
+            if ($deleted) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Product deleted successfully.'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to delete the product.'
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
     }
+    
+    
 }
