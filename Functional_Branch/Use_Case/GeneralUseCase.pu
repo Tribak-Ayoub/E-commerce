@@ -34,6 +34,7 @@ rectangle "Watches_Ecommerce" {
   UC_Order ..> UC_OrderConfirmation : "«include»"
   UC_OrderConfirmation ..> UC_SendNotification : "«include»"
   UC_CancelOrder ..> UC_RequestRefund : "«extend»"
+  UC_ProcessReturn ..> UC_CustomerSupport : "«include»"
 }
 
 Visitor <|-- Customer : "Becomes"
