@@ -1,0 +1,80 @@
+classDiagram
+    direction LR
+    
+    class User {
+        <<Abstract>>
+        -id: Int
+        -name: String
+        -email: String
+        -password: String
+        -role: String
+    }
+
+    class Customer {
+ 
+    }
+
+    class Administrator { 
+ 
+    }
+
+    class Product {
+        -id: Int
+        -name: String
+        -description: String
+        -price: Double
+        -stock: Int
+        -colorOptions: List~String~
+        -sizeOptions: List~String~
+    }
+
+    class ProductImage {
+        -id: Int
+        -imageUrl: String
+        -caption: String
+    }
+
+    class Order {
+        -id: Int
+        -status: String
+        -orderDate: DateTime
+    }
+
+    class OrderItem {
+        -id: Int
+        -quantity: Int
+        -selectedColor: String
+        -selectedSize: String
+    }
+
+    class Payment {
+        -id: Int
+        -amount: Double
+        -status: String
+        -paymentDate: DateTime
+    }
+
+    class Review {
+        -id: Int
+        -rating: Int
+        -comment: String
+        -reviewDate: DateTime
+    }
+
+    %% Inheritance Relationships
+    User <|-- Customer
+    User <|-- Administrator
+
+    %% Association Relationships
+    Customer "1" --> "0..*" Order : Places
+    Customer "1" --> "0..*" Review : Writes
+    Review "0..*" --> "1" Product : About
+
+    Administrator "1" --> "0..*" Product : Manages
+    Administrator "1" --> "0..*" Order : Manages
+
+    Order "1" --> "1..*" OrderItem : Contains
+    Order "1" --> "1" Payment : Processes
+
+    OrderItem "1..*" --> "1" Product : References
+    Product "1" <-- "1..*" ProductImage : Contains
