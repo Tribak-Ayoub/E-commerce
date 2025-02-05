@@ -1,0 +1,19 @@
+@startuml Watches_Ecommerce_Sprint4
+left to right direction
+actor Customer
+actor Administrator
+
+rectangle "Watches_Ecommerce" {
+  usecase "Leave a review" as UC_Review
+  usecase "View analytics" as UC_ViewAnalytics
+  usecase "Handle customer support" as UC_CustomerSupport
+  usecase "Process return" as UC_ProcessReturn
+
+  UC_ProcessReturn ..> UC_CustomerSupport : "«include»"
+}
+
+Customer -- UC_Review
+Administrator -- UC_ViewAnalytics
+Administrator -- UC_CustomerSupport
+Administrator -- UC_ProcessReturn
+@enduml
