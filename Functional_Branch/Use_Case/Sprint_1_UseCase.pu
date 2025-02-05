@@ -1,0 +1,31 @@
+@startuml Watches_Ecommerce_Sprint1
+left to right direction
+actor Visitor
+actor Customer
+actor Administrator
+
+rectangle "Watches_Ecommerce" {
+  usecase "Browse watches" as UC_Browse
+  usecase "Search for watches" as UC_Search
+  usecase "Register" as UC_Register
+  usecase "Log in" as UC_Login
+  usecase "Log out" as UC_Logout
+  usecase "Manage products" as UC_ManageProducts
+  usecase "Authenticate" as UC_Authenticate
+
+  UC_Authenticate ..> UC_Register : "«include»"
+  UC_Authenticate ..> UC_Login : "«include»"
+}
+
+Visitor <|-- Customer : "Becomes"
+Visitor -- UC_Browse
+Visitor -- UC_Search
+Visitor -- UC_Authenticate
+
+Customer -- UC_Browse
+Customer -- UC_Search
+Customer -- UC_Authenticate
+Customer -- UC_Logout
+
+Administrator -- UC_ManageProducts
+@enduml
