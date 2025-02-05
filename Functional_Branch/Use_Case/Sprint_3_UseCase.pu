@@ -1,0 +1,20 @@
+@startuml Watches_Ecommerce_Sprint3
+left to right direction
+actor Customer
+
+rectangle "Watches_Ecommerce" {
+  usecase "Make a payment" as UC_Payment
+  usecase "Track order status" as UC_TrackOrder
+  usecase "Cancel order" as UC_CancelOrder
+  usecase "View order history" as UC_OrderHistory
+  usecase "Request refund" as UC_RequestRefund
+
+  UC_CancelOrder ..> UC_RequestRefund : "«extend»"
+}
+
+Customer -- UC_Payment
+Customer -- UC_TrackOrder
+Customer -- UC_CancelOrder
+Customer -- UC_OrderHistory
+Customer -- UC_RequestRefund
+@enduml
