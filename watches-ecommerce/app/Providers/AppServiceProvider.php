@@ -19,6 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        $this->app->bind(
+            \App\Repositories\ProductRepositoryInterface::class,
+            \App\Repositories\ProductRepository::class
+        );
     }
 }
