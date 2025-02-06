@@ -3,20 +3,28 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\Http\JsonResponse;
 
 class EmailVerificationPromptController extends Controller
 {
     /**
      * Display the email verification prompt.
      */
-    public function __invoke(Request $request): RedirectResponse|Response
+    public function __invoke(Request $request): JsonResponse
     {
-        return $request->user()->hasVerifiedEmail()
-                    ? redirect()->intended(route('dashboard', absolute: false))
-                    : Inertia::render('Auth/VerifyEmail', ['status' => session('status')]);
+        // If the user has already verified their email, redirect to the dashboard
+        if ($request->user()->hasVerifiedEmail()) {
+            return response()->json([
+                'message' => 'Email already verified.',
+                'redirect' => route('dashboard'),
+            ], 200);
+        }
+
+        // Otherwise, prompt for email verification
+        return response()->json([
+            'message' => 'Please verify your email.',
+            'redirect' => route('verification.notice'), // URL to the email verification page
+        ], 200);
     }
 }

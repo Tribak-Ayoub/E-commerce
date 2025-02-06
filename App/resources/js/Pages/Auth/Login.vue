@@ -1,4 +1,5 @@
 <script setup>
+import { useAuthStore } from '@/stores/authStore';
 import Checkbox from '@/Components/Checkbox.vue';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputError from '@/Components/InputError.vue';
@@ -9,6 +10,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
+const authStore = useAuthStore(); 
 
 const form = ref({
     email: '',
@@ -22,24 +24,28 @@ const processing = ref(false);
 const canResetPassword = ref(false);
 
 const submit = async () => {
+    console.log('Submit clicked');  // ✅ Debugging
     processing.value = true;
     try {
+        console.log('Calling authStore.login()...');
         await authStore.login({
             email: form.value.email,
             password: form.value.password,
             remember: form.value.remember
         });
-        router.push({ name: 'dashboard' });
+
+        const redirectTo = router.currentRoute.value.query.redirect || '/dashboard';
+        console.log('Redirecting to:', redirectTo);  // ✅ Debugging
+        router.push(redirectTo);
     } catch (error) {
-        if (error.response && error.response.data.errors) {
-            form.value.errors = error.response.data.errors;
-        } else {
-            console.error('Login failed:', error);
-        }
+        console.error('Login failed:', error);
+        form.value.errors = error.response?.data.errors || {};
     } finally {
         processing.value = false;
     }
 };
+
+
 </script>
 
 <template>
