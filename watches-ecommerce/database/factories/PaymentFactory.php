@@ -21,7 +21,6 @@ class PaymentFactory extends Factory
             'order_id' => Order::factory(),
             'amount' => $this->faker->randomFloat(2, 10, 500),
             'status' => $this->faker->randomElement(['pending', 'completed', 'failed']),
-            'paymentDate' => $this->faker->dateTimeThisYear(),
         ];
     }
 }

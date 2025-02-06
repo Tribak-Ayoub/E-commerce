@@ -18,9 +18,8 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         return [
-            'customer_id' => User::factory(),
-            'status' => $this->faker->randomElement(['pending', 'shipped', 'delivered']),
-            'orderDate' => $this->faker->dateTimeThisYear(),
+            'user_id' => User::factory(),
+            'status' => $this->faker->randomElement(['pending', 'completed', 'canceled']),
         ];
     }
 }

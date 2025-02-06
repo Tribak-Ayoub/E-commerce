@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->integer('quantity');
-            $table->string('selected_color');
-            $table->string('selected_size');
+            $table->string('selectedColor');
+            $table->string('selectedSize');
             $table->timestamps();
             $table->softDeletes();
         });

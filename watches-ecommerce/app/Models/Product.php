@@ -20,6 +20,12 @@ class Product extends Model
         'sizeOptions',
     ];
 
+
+    protected $casts = [
+        'colorOptions' => 'array',
+        'sizeOptions' => 'array',
+    ];
+
     // Relationship with Product Images
     public function images()
     {

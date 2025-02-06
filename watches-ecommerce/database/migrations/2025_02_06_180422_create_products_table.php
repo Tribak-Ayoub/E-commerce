@@ -17,8 +17,8 @@ return new class extends Migration
             $table->text('description');
             $table->decimal('price', 10, 2);
             $table->integer('stock');
-            $table->json('color_options')->nullable();
-            $table->json('size_options')->nullable();
+            $table->json('colorOptions')->nullable();
+            $table->json('sizeOptions')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
