@@ -44,4 +44,13 @@
             </x-primary-button>
         </div>
     </form>
+
+    <!-- Pass the loggedIn state to localStorage -->
+    <script>
+        @if (session('loggedIn'))
+            localStorage.setItem('loggedIn', true);
+        @else
+            localStorage.setItem('loggedIn', false);
+        @endif
+    </script>
 </x-guest-layout>
