@@ -3,23 +3,56 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { Link, useForm, usePage } from '@inertiajs/vue3';
+import { ref, reactive } from 'vue';
+import { useRouter } from 'vue-router';
 
-defineProps({
-    mustVerifyEmail: {
-        type: Boolean,
-    },
-    status: {
-        type: String,
-    },
-});
+const router = useRouter();
+const user = {
+    name: 'John Doe', // replace with actual data
+    email: 'john@example.com', // replace with actual data
+};
 
-const user = usePage().props.auth.user;
-
-const form = useForm({
+const form = reactive({
     name: user.name,
     email: user.email,
+    errors: {},
+    processing: false,
+    recentlySuccessful: false,
 });
+
+const mustVerifyEmail = false; // set this based on your app's logic
+const status = ''; // set this based on your app's status
+
+const updateProfile = async () => {
+    form.processing = true;
+    form.errors = {}; // reset errors
+
+    try {
+        const response = await fetch(route('profile.update'), {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: form.name,
+                email: form.email,
+            }),
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            form.errors = data.errors || {};
+            return;
+        }
+
+        form.recentlySuccessful = true;
+        setTimeout(() => form.recentlySuccessful = false, 3000);
+    } catch (error) {
+        console.error('Error updating profile:', error);
+    } finally {
+        form.processing = false;
+    }
+};
 </script>
 
 <template>
@@ -34,10 +67,7 @@ const form = useForm({
             </p>
         </header>
 
-        <form
-            @submit.prevent="form.patch(route('profile.update'))"
-            class="mt-6 space-y-6"
-        >
+        <form @submit.prevent="updateProfile" class="mt-6 space-y-6">
             <div>
                 <InputLabel for="name" value="Name" />
 
@@ -69,17 +99,15 @@ const form = useForm({
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
-            <div v-if="mustVerifyEmail && user.email_verified_at === null">
+            <div v-if="mustVerifyEmail && !user.email_verified_at">
                 <p class="mt-2 text-sm text-gray-800">
                     Your email address is unverified.
-                    <Link
+                    <a
                         :href="route('verification.send')"
-                        method="post"
-                        as="button"
                         class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
                         Click here to re-send the verification email.
-                    </Link>
+                    </a>
                 </p>
 
                 <div

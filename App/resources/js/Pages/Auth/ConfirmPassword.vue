@@ -4,23 +4,37 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
-const form = useForm({
+const router = useRouter();
+
+const form = ref({
     password: '',
+    errors: {}
 });
 
-const submit = () => {
-    form.post(route('password.confirm'), {
-        onFinish: () => form.reset(),
-    });
+const processing = ref(false);
+
+const submit = async () => {
+    processing.value = true;
+    try {
+        await authStore.confirmPassword(form.value.password);
+        router.push({ name: 'dashboard' }); // Redirect to dashboard after confirmation
+    } catch (error) {
+        if (error.response && error.response.data.errors) {
+            form.value.errors = error.response.data.errors;
+        } else {
+            console.error('Password confirmation failed:', error);
+        }
+    } finally {
+        processing.value = false;
+    }
 };
 </script>
 
 <template>
     <GuestLayout>
-        <Head title="Confirm Password" />
-
         <div class="mb-4 text-sm text-gray-600">
             This is a secure area of the application. Please confirm your
             password before continuing.
@@ -44,8 +58,8 @@ const submit = () => {
             <div class="mt-4 flex justify-end">
                 <PrimaryButton
                     class="ms-4"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
+                    :class="{ 'opacity-25': processing }"
+                    :disabled="processing"
                 >
                     Confirm
                 </PrimaryButton>

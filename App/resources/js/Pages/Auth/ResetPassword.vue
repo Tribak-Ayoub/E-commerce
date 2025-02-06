@@ -1,10 +1,13 @@
 <script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+
+const router = useRouter(); // Vue Router instance
 
 const props = defineProps({
     email: {
@@ -17,28 +20,59 @@ const props = defineProps({
     },
 });
 
-const form = useForm({
+// Define form state
+const form = ref({
     token: props.token,
     email: props.email,
     password: '',
     password_confirmation: '',
+    errors: {},
+    processing: false,
 });
 
-const submit = () => {
-    form.post(route('password.store'), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
-    });
+// Submit function
+const submit = async () => {
+    form.value.processing = true;
+    form.value.errors = {}; // Clear previous errors
+
+    try {
+        const response = await fetch('/reset-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            },
+            body: JSON.stringify({
+                token: form.value.token,
+                email: form.value.email,
+                password: form.value.password,
+                password_confirmation: form.value.password_confirmation,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            form.value.errors = data.errors || {};
+        } else {
+            // Redirect to login page after successful reset
+            router.push('/login');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    } finally {
+        form.value.processing = false;
+    }
 };
 </script>
 
 <template>
     <GuestLayout>
-        <Head title="Reset Password" />
+        <h1 class="text-xl font-bold text-center">Reset Password</h1>
 
         <form @submit.prevent="submit">
             <div>
                 <InputLabel for="email" value="Email" />
-
                 <TextInput
                     id="email"
                     type="email"
@@ -48,13 +82,11 @@ const submit = () => {
                     autofocus
                     autocomplete="username"
                 />
-
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
             <div class="mt-4">
                 <InputLabel for="password" value="Password" />
-
                 <TextInput
                     id="password"
                     type="password"
@@ -63,7 +95,6 @@ const submit = () => {
                     required
                     autocomplete="new-password"
                 />
-
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
@@ -72,7 +103,6 @@ const submit = () => {
                     for="password_confirmation"
                     value="Confirm Password"
                 />
-
                 <TextInput
                     id="password_confirmation"
                     type="password"
@@ -81,7 +111,6 @@ const submit = () => {
                     required
                     autocomplete="new-password"
                 />
-
                 <InputError
                     class="mt-2"
                     :message="form.errors.password_confirmation"

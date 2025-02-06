@@ -1,4 +1,4 @@
-<script setup>
+<!-- <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 
 defineProps({
@@ -381,6 +381,43 @@ function handleImageError() {
                     Laravel v{{ laravelVersion }} (PHP v{{ phpVersion }})
                 </footer>
             </div>
+        </div>
+    </div>
+</template> -->
+
+<script setup>
+import { useRouter } from 'vue-router';
+
+defineProps({
+    canLogin: {
+        type: Boolean,
+    },
+    canRegister: {
+        type: Boolean,
+    },
+});
+
+const router = useRouter();
+
+// Handle Login navigation
+const goToLogin = () => {
+    router.push({ name: 'login' }); // Use Vue Router to navigate to the login page
+};
+
+// Handle Register navigation
+const goToRegister = () => {
+    router.push({ name: 'register' }); // Use Vue Router to navigate to the register page
+};
+</script>
+
+<template>
+    <div>
+        <div v-if="canLogin" class="login-button">
+            <button @click="goToLogin" class="btn btn-primary">Login</button>
+        </div>
+
+        <div v-if="canRegister" class="register-button">
+            <button @click="goToRegister" class="btn btn-secondary">Register</button>
         </div>
     </div>
 </template>

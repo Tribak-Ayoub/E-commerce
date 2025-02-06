@@ -3,33 +3,66 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
+import { useRouter } from 'vue-router';
 
 const passwordInput = ref(null);
 const currentPasswordInput = ref(null);
 
-const form = useForm({
+const form = reactive({
     current_password: '',
     password: '',
     password_confirmation: '',
+    errors: {},
+    processing: false,
+    recentlySuccessful: false,
 });
 
-const updatePassword = () => {
-    form.put(route('password.update'), {
-        preserveScroll: true,
-        onSuccess: () => form.reset(),
-        onError: () => {
+const router = useRouter();
+
+const updatePassword = async () => {
+    form.processing = true;
+    form.errors = {}; // Reset errors
+
+    try {
+        const response = await fetch(route('password.update'), {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                current_password: form.current_password,
+                password: form.password,
+                password_confirmation: form.password_confirmation,
+            }),
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            form.errors = data.errors || {};
             if (form.errors.password) {
-                form.reset('password', 'password_confirmation');
+                form.password = '';
+                form.password_confirmation = '';
                 passwordInput.value.focus();
             }
             if (form.errors.current_password) {
-                form.reset('current_password');
+                form.current_password = '';
                 currentPasswordInput.value.focus();
             }
-        },
-    });
+            return;
+        }
+
+        // On success
+        form.recentlySuccessful = true;
+        form.current_password = '';
+        form.password = '';
+        form.password_confirmation = '';
+        setTimeout(() => form.recentlySuccessful = false, 3000);
+    } catch (error) {
+        console.error('An error occurred:', error);
+    } finally {
+        form.processing = false;
+    }
 };
 </script>
 
