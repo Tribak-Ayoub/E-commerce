@@ -14,3 +14,10 @@ php artisan breeze:install
 npm install
 
 npm install axios
+
+php artisan make:model Product -mfs
+php artisan make:model ProductImage -mfs
+php artisan make:model Order -mfs
+php artisan make:model OrderItem -mfs
+php artisan make:model Payment -mfs
+php artisan make:model Review -mfs
