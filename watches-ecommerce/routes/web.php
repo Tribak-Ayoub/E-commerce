@@ -8,8 +8,12 @@ Route::get('/', function () {
 });
 
 Route::get('/{any}', function () {
-    return view('app'); // Loads Vue
+    return view('welcome'); // Loads Vue
 })->where('any', '.*');
+
+// Route::get('/{vue_capture?}', function () {
+//     return view('welcome');
+// })->where('vue_capture', '[\/\w\.-]*');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
