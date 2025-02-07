@@ -6,12 +6,16 @@ const routes = [
         component: () => import('./Pages/HomeRoute.vue'),
         meta: { requiresAuth: true } // Requires authentication
     },
-    // {
-    //     path: '/products',
-    //     component: () => import('./Pages/Products/Index.vue'),
-    //     meta: { requiresAuth: true } // Requires authentication
-    // },
-    // // Add more SPA routes here
+    {
+        path: '/products',
+        component: () => import('./Pages/Products/Index.vue'),
+        meta: { requiresAuth: true } // Requires authentication
+    },
+    {
+        path: '/products/create',
+        component: () => import('./Pages/Products/Create.vue'),
+        meta: { requiresAuth: true } // Requires authentication
+    }
 ];
 
 const router = createRouter({

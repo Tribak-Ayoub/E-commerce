@@ -1,7 +1,7 @@
 <template>
     <div>
         <h2>HOME</h2>
-        <!-- <router-link to="/login"> Take me to the Test page </router-link> -->
+        <router-link to="/products">products </router-link>
         <!-- <button @click.prevent="triggerEndpoint">Trigger Endpoint</button>
         <p v-if="response">{{ response.data }}</p> -->
     </div>
