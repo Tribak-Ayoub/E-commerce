@@ -24,17 +24,17 @@ const router = createRouter({
 });
 
 // Navigation guard to check authentication
-router.beforeEach((to, from, next) => {
-    const isAuthenticated = localStorage.getItem('loggedIn') === 'true';
+// router.beforeEach((to, from, next) => {
+//     const isAuthenticated = localStorage.getItem('loggedIn') === 'true';
 
-    // Exclude authentication routes from the guard
-    const isAuthRoute = ['/login', '/register', '/forgot-password'].includes(to.path);
+//     // Exclude authentication routes from the guard
+//     const isAuthRoute = ['/login', '/register', '/forgot-password'].includes(to.path);
 
-    if (to.meta.requiresAuth && !isAuthenticated && !isAuthRoute) {
-        window.location.href = '/login'; // Redirect to Laravel login page
-    } else {
-        next();
-    }
-});
+//     if (to.meta.requiresAuth && !isAuthenticated && !isAuthRoute) {
+//         window.location.href = '/login'; // Redirect to Laravel login page
+//     } else {
+//         next();
+//     }
+// });
 
 export default router;

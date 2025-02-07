@@ -13,7 +13,7 @@
         <router-view></router-view>
     </div>
     <script>
-        localStorage.setItem('loggedIn', {{ auth()->check() ? 'true' : 'false' }});
+        // localStorage.setItem('loggedIn', {{ auth()->check() ? 'true' : 'false' }});
     </script>
 </body>
 </html>

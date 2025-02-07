@@ -15,11 +15,20 @@ Route::middleware('auth')->group(function () {
 });
 
 // Route::middleware('auth')->group(function () {
-    Route::apiResource('products', ProductController::class);
+    Route::resource('products', ProductController::class);
 // });
-// Route::prefix('api')->middleware('auth')->group(function () {
-//     Route::apiResource('products', ProductController::class);
+
+// Route::prefix('api')->group(function () {
+//     Route::resource('products', ProductController::class);
 // });
+
+// Route::get('/',function(){
+// return 'hello';
+// });
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 // SPA Catch-All Route (must be last)
 Route::middleware('auth')->get('/{any}', function () {
