@@ -8,7 +8,7 @@ class ProductRepository implements ProductRepositoryInterface
 {
     public function all($paginate = 10)
     {
-        return Product::paginate($paginate);
+        return $paginate ? Product::paginate(5) : Product::all();
     }
 
     public function create(array $data)

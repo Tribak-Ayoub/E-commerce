@@ -14,9 +14,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Route::middleware('auth')->group(function () {
-    Route::resource('products', ProductController::class);
-// });
+Route::middleware('auth')->group(function () {
+    Route::resource('/products', ProductController::class);
+});
 
 // Route::prefix('api')->group(function () {
 //     Route::resource('products', ProductController::class);
@@ -26,11 +26,11 @@ Route::middleware('auth')->group(function () {
 // return 'hello';
 // });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
 
 // SPA Catch-All Route (must be last)
-Route::middleware('auth')->get('/{any}', function () {
+Route::get('/{any}', function () {
     return view('app'); // Blade view that mounts your Vue app
 })->where('any', '.*');

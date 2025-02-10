@@ -1,93 +1,67 @@
 <template>
-    <div class="container mx-auto px-4 py-8">
-        <!-- Page Title -->
-        <h1 class="text-3xl font-bold mb-6">Products</h1>
+    <AppLayout>
+        <div class="container mx-auto px-4 py-8">
+            <!-- Page Title -->
+            <h1 class="text-3xl font-bold mb-6">Products</h1>
 
-        <!-- Create Product Button -->
-        <div class="mb-6">
-            <router-link to="/products/create"
-                class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200">
-                Create New Product
-            </router-link>
-        </div>
+            <!-- Create Product Button -->
+            <div class="mb-6">
+                <button @click="openCreateModal" class="bg-blue-500 text-black px-4 py-2 rounded">Create
+                    Product</button>
+            </div>
 
-        <!-- Loading State -->
-        <div v-if="loading" class="text-center text-gray-600">
-            Loading products...
-        </div>
-
-        <!-- Error State -->
-        <div v-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-6">
-            {{ error }}
-        </div>
-
-        <!-- Products Table -->
-        <div v-if="!loading && !error">
-            <table class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Name
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Description
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Price
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    <tr v-for="product in products" :key="product.id" class="hover:bg-gray-50 transition duration-200">
-                        <td class="px-6 py-4 text-sm text-gray-900">
-                            {{ product.name }}
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-900">
-                            {{ product.description }}
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-900">
-                            ${{ product.price }}
-                        </td>
-
-                        <td class="px-6 py-4 text-sm text-gray-900">
-
-                            <!-- Delete Button -->
-                            <button @click="deleteProduct(product.id)" class="text-red-500 hover:text-red-700">
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <!-- Product List -->
+            <div v-if="!loading && !error">
+                <table class="w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="product in products" :key="product.id">
+                            <td class="px-6 py-4">{{ product.name }}</td>
+                            <td class="px-6 py-4">{{ product.description }}</td>
+                            <td class="px-6 py-4">${{ product.price }}</td>
+                            <td class="px-6 py-4">
+                                <button @click="deleteProduct(product.id)" class="text-red-700">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Empty State -->
-            <div v-if="products.length === 0" class="text-center text-gray-600 mt-6">
-                No products found.
-            </div>
+            <div v-if="products.length === 0" class="text-center text-gray-600 mt-6">No products found.</div>
+
+            <!-- Create Product Modal -->
+            <CreateProductModal :isOpen="isModalOpen" @close="closeCreateModal" @productAdded="addProduct" />
         </div>
-    </div>
+    </AppLayout>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import AppLayout from '../../layouts/AppLayout.vue';
+import CreateProductModal from './create.vue';
 
 // State
 const products = ref([]);
 const loading = ref(true);
 const error = ref(null);
+const isModalOpen = ref(false);
 
 // Fetch Products
 const fetchProducts = async () => {
     try {
-        const response = await axios.get('http://127.0.0.1:8000/products');
-        console.log(response.data);
-        products.value = response.data;
+        const response = await axios.get('/products');
+        products.value = response.data.data ?? response.data;
     } catch (err) {
-        error.value = 'Failed to fetch products. Please try again later.';
+        error.value = 'Failed to fetch products.';
         console.error('Error fetching products:', err);
     } finally {
         loading.value = false;
@@ -98,23 +72,29 @@ const fetchProducts = async () => {
 const deleteProduct = async (id) => {
     if (confirm('Are you sure you want to delete this product?')) {
         try {
-            await axios.delete(`/products/${id}`); // Updated endpoint
+            await axios.delete(`/products/${id}`);
             products.value = products.value.filter(product => product.id !== id);
         } catch (err) {
-            error.value = 'Failed to delete product. Please try again later.';
+            error.value = 'Failed to delete product.';
             console.error('Error deleting product:', err);
         }
     }
 };
 
-// Fetch products on component mount
-onMounted(() => {
-    fetchProducts();
-});
+// Modal Handlers
+const openCreateModal = () => isModalOpen.value = true;
+const closeCreateModal = () => isModalOpen.value = false;
+
+// Add New Product to List
+const addProduct = (newProduct) => {
+    products.value.push(newProduct);
+};
+
+// Fetch products on mount
+onMounted(fetchProducts);
 </script>
 
 <style scoped>
-/* Add custom styles here if needed */
 .container {
     max-width: 1200px;
 }

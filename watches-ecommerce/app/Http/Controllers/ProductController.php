@@ -20,7 +20,7 @@ class ProductController extends Controller
     public function index()
     {
         $products = $this->productRepository->all();
-        return response()->json($products); // Return products as JSON
+        return $products;
     }
 
     /**

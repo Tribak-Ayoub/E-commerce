@@ -1,13 +1,11 @@
 <template>
-    <div>
+    <AppLayout>
         <h2>HOME</h2>
         <router-link to="/products">products </router-link>
-        <!-- <button @click.prevent="triggerEndpoint">Trigger Endpoint</button>
-        <p v-if="response">{{ response.data }}</p> -->
-    </div>
+    </AppLayout>
 </template>
 
-<script setup>
+<script>
 // import axios from "axios";
 // import { ref } from "vue";
 
@@ -20,4 +18,12 @@
 //         console.error(error);
 //     }
 // };
+
+import AppLayout from '../layouts/AppLayout.vue'; // Import the layout
+
+export default {
+    components: {
+        AppLayout
+    }
+};
 </script>

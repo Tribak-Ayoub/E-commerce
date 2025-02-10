@@ -7,14 +7,31 @@ const routes = [
         meta: { requiresAuth: true } // Requires authentication
     },
     {
+        path: '/dashboard',
+        component: () => import('./Pages/Dashboard.vue'),
+    },
+    {
         path: '/products',
         component: () => import('./Pages/Products/Index.vue'),
         meta: { requiresAuth: true } // Requires authentication
     },
     {
-        path: '/products/create',
-        component: () => import('./Pages/Products/Create.vue'),
-        meta: { requiresAuth: true } // Requires authentication
+        path: '/login', // Redirects to Laravel's Blade login
+        beforeEnter() {
+            window.location.href = "/login"; // Blade Login Page
+        }
+    },
+    {
+        path: '/register', // Redirects to Laravel's Blade register
+        beforeEnter() {
+            window.location.href = "/register"; // Blade Register Page
+        }
+    },
+    {
+        path: '/profile/edit', // Redirects to Laravel's Blade profile edit
+        beforeEnter() {
+            window.location.href = "/profile"; // Blade Profile Page
+        }
     }
 ];
 
